@@ -24,10 +24,16 @@ const char *fragmentShaderSource = "#version 330 core\n"
 
 int main(){
     // 初始化 GLFW
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    if (!glfwInit())
+    {
+        std::cout << "Failed to initialize GLFW" << std::endl;
+        return -1;
+    }
+
+    // 配置 GLFW
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); // 主版本号
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); // 次版本号
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // 核心模式
 
     // 创建窗口对象
     GLFWwindow* window = glfwCreateWindow(500, 500, "Hello World", NULL, NULL);
@@ -53,12 +59,24 @@ int main(){
     vertexShader = glCreateShader(GL_VERTEX_SHADER); // 创建顶点着色器
     glShaderSource(vertexShader, 1, &vertexShaderSource, NULL); // 将着色器源码附加到着色器对象上
     glCompileShader(vertexShader); // 编译着色器
+    int success;
+    char infoLog[512];
+    if (!success)
+    {
+        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog); // 获取编译错误信息
+        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+    }
 
     // 片段着色器
     unsigned int fragmentShader; // 片段着色器 ID
     fragmentShader = glCreateShader(GL_FRAGMENT_SHADER); // 创建片段着色器
     glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL); // 将着色器源码附加到着色器对象上
     glCompileShader(fragmentShader); // 编译着色器
+    if (!success)
+    {
+        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog); // 获取编译错误信息
+        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+    }
 
     // 着色器程序
     unsigned int shaderProgram; // 着色器程序 ID
@@ -68,6 +86,11 @@ int main(){
     glLinkProgram(shaderProgram); // 链接着色器程序
     glDeleteShader(vertexShader); // 删除着色器对象，链接后不再需要
     glDeleteShader(fragmentShader); // 删除着色器对象，链接后不再需要
+    if (!success)
+    {
+        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog); // 获取链接错误信息
+        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+    }
 
     // 顶点数据和缓冲设置
     float vertices[] = {
