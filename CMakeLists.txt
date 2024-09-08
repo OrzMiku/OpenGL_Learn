@@ -27,6 +27,7 @@ link_directories(
 add_executable(
     OpenGL_Learn 
     src/main.cpp
+    src/glad.c
 )
 
 target_link_libraries(
