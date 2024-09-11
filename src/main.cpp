@@ -107,10 +107,16 @@ int main(){
         std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
     }
 
+    // 两个三角形组成一个矩形
     float vertices[] = {
-        -0.5f, -0.5f, 0.0f,
-         0.5f, -0.5f, 0.0f,
-         0.0f,  0.5f, 0.0f
+        // 第一个三角形
+        -0.5f, -0.5f, 0.0f, // 左下角
+         0.5f, -0.5f, 0.0f, // 右下角
+         0.5f,  0.5f, 0.0f, // 右上角
+        // 第二个三角形
+        0.5f,  0.5f, 0.0f, // 右上角
+        -0.5f,  0.5f, 0.0f, // 左上角
+        -0.5f, -0.5f, 0.0f  // 左下角
     };
 
     /**
@@ -149,7 +155,7 @@ int main(){
 
         glUseProgram(shaderProgram); // 使用着色器程序
         glBindVertexArray(VAO); // 绑定顶点数组对象
-        glDrawArrays(GL_TRIANGLES, 0, 3); // 绘制三角形
+        glDrawArrays(GL_TRIANGLES, 0, 6); // 绘制三角形
 
         // 检查并调用事件，交换缓冲
         glfwSwapBuffers(window);
