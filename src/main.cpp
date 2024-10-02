@@ -16,13 +16,18 @@ const char *vertexShaderSource = "#version 330 core\n"
                                  "uniform float time;\n"
                                  "void main()\n"
                                  "{\n"
-                                 "   float theta = radians(45.0) + time;\n"
+                                 //  跟随时间旋转
+                                 "   float speed = 5.0;\n"
+                                 "   float theta = radians(45.0) + time * speed;\n"
+                                 //  旋转矩阵
                                  "   mat3 rotate = mat3(cos(theta), -sin(theta), 0.0,\n"
                                  "                      sin(theta), cos(theta), 0.0,\n"
                                  "                      0.0, 0.0, 1.0);\n"
-                                 "   mat3 affine = mat3(1.2, 0.0, 0.0,\n"
-                                 "                     0.0, 0.8, 0.0,\n"
+                                 //  仿射矩阵
+                                 "   mat3 affine = mat3(0.8, 0.0, 0.0,\n"
+                                 "                     0.0, 1.2, 0.0,\n"
                                  "                     0.0, 0.0, 1.0);\n"
+                                 //  应用仿射矩阵和旋转矩阵，注意顺序
                                  "   vec3 finalPos = rotate * affine * vec3(aPos.xy, 1.0);\n"
                                  "   gl_Position = vec4(finalPos, 1.0);\n"
                                  "   ourColor = aColor;\n"
