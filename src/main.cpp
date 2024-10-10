@@ -11,26 +11,11 @@ void processInput(GLFWwindow *window);
  */
 const char *vertexShaderSource = "#version 330 core\n"
                                  "layout (location = 0) in vec3 aPos;\n"
-                                 "layout (location = 1) in vec3 aColor;\n"
                                  "out vec3 ourColor;\n"
-                                 "uniform float time;\n"
                                  "void main()\n"
                                  "{\n"
-                                 //  跟随时间旋转
-                                 "   float speed = 5.0;\n"
-                                 "   float theta = radians(45.0) + time * speed;\n"
-                                 //  旋转矩阵
-                                 "   mat3 rotate = mat3(cos(theta), -sin(theta), 0.0,\n"
-                                 "                      sin(theta), cos(theta), 0.0,\n"
-                                 "                      0.0, 0.0, 1.0);\n"
-                                 //  仿射矩阵
-                                 "   mat3 affine = mat3(0.8, 0.0, 0.0,\n"
-                                 "                     0.0, 1.2, 0.0,\n"
-                                 "                     0.0, 0.0, 1.0);\n"
-                                 //  应用仿射矩阵和旋转矩阵，注意顺序
-                                 "   vec3 finalPos = rotate * affine * vec3(aPos.xy, 1.0);\n"
-                                 "   gl_Position = vec4(finalPos, 1.0);\n"
-                                 "   ourColor = aColor;\n"
+                                 "   gl_Position = vec4(aPos, 1.0);\n"
+                                 "   ourColor = vec3(1.0, 1.0, 1.0);\n"
                                  "}\0";
 
 /**
@@ -132,14 +117,15 @@ int main()
 
     // 两个三角形组成一个矩形
     float vertices[] = {
-        // 第一个三角形，坐标+颜色
-        -0.5f, -0.5f, 0.0f, 0.0f, 0.3f, 1.0f, // 左下角
-        0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,  // 右下角
-        0.5f, 0.5f, 0.0f, 0.0f, 0.3f, 1.0f,   // 右上角
-        // 第二个三角形
-        0.5f, 0.5f, 0.0f, 0.0f, 0.3f, 1.0f,  // 右上角
-        -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // 左上角
-        -0.5f, -0.5f, 0.0f, 0.0f, 0.3f, 1.0f // 左下角
+        -0.5f,
+        -0.5f,
+        0.0f,
+        0.5f,
+        -0.5f,
+        0.0f,
+        0.0f,
+        0.5f,
+        0.0f,
     };
 
     /**
@@ -157,15 +143,8 @@ int main()
      * 表示顶点索引位置为0，有 3 个值，每个值为 float 类型，不需要标准化，步长为 6 个 float，偏移量为 0
      * glEnableVertexAttribArray的参数是顶点属性的位置值，这个值是在顶点着色器中使用 layout (location = 0) in vec3 aPos; 定义的
      */
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0); // 设置顶点属性指针
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0); // 设置顶点属性指针
     glEnableVertexAttribArray(0);                                                  // 启用顶点属性
-
-    /**
-     * 表示顶点索引位置为1，有 3 个值，每个值为 float 类型，不需要标准化，步长为 6 个 float，偏移量为 3
-     * glEnableVertexAttribArray的参数是顶点属性的位置值，这个值是在顶点着色器中使用 layout (location = 1) in vec3 aColor; 定义的
-     */
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float))); // 设置顶点属性指针
-    glEnableVertexAttribArray(1);                                                                    // 启用顶点属性
 
     /**
      * 已经将数据存入缓冲对象，不需要对 VBO 进行操作，可以解绑缓冲对象
@@ -180,17 +159,13 @@ int main()
         // 输入
         processInput(window);
 
-        // 获取时间
-        float timeValue = glfwGetTime();
-
         // 渲染
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(shaderProgram);                                         // 使用着色器程序
-        glUniform1f(glGetUniformLocation(shaderProgram, "time"), timeValue); // 设置 uniform 变量
-        glBindVertexArray(VAO);                                              // 绑定顶点数组对象
-        glDrawArrays(GL_TRIANGLES, 0, 6);                                    // 绘制三角形
+        glUseProgram(shaderProgram);      // 使用着色器程序
+        glBindVertexArray(VAO);           // 绑定顶点数组对象
+        glDrawArrays(GL_TRIANGLES, 0, 6); // 绘制三角形
 
         // 检查并调用事件，交换缓冲
         glfwSwapBuffers(window);
