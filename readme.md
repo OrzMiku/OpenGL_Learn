@@ -29,3 +29,7 @@
 1. [下载 Ninja](https://github.com/ninja-build/ninja/releases)。
 2. 将 Ninja 添加到环境变量中，或者将 Ninja 的可执行文件放到 System32 目录下。
 3. 重启终端/IDE。
+
+## 注意
+
+如果你修改了shaders文件夹下的文件，需要手动删除build文件夹下的shaders文件夹，然后重新编译。

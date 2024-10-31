@@ -2,34 +2,10 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
+#include "shader.hpp"
+
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window);
-
-/**
- * 顶点着色器源码
- * 顶点着色器是一个小程序，运行在 GPU 上，用来处理顶点数据
- */
-const char *vertexShaderSource = "#version 330 core\n"
-                                 "layout (location = 0) in vec3 aPos;\n"
-                                 "layout (location = 1) in vec3 aColor;\n"
-                                 "out vec3 ourColor;\n"
-                                 "void main()\n"
-                                 "{\n"
-                                 "   gl_Position = vec4(aPos, 1.0);\n"
-                                 "   ourColor = aColor;\n"
-                                 "}\0";
-
-/**
- * 片段着色器源码
- * 片段着色器用来计算像素最后的颜色输出，不负责绘制图形形状
- */
-const char *fragmentShaderSource = "#version 330 core\n"
-                                   "in vec3 ourColor;\n"
-                                   "out vec4 FragColor;\n"
-                                   "void main()\n"
-                                   "{\n"
-                                   "   FragColor = vec4(ourColor, 1.0f);\n"
-                                   "}\0";
 
 int main()
 {
@@ -66,55 +42,7 @@ int main()
     glViewport(0, 0, 500, 500);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    /**
-     * 顶点着色器
-     * 创建着色器对象，附加源码到着色器对象，编译着色器，检查编译错误
-     */
-    unsigned int vertexShader;                                  // 顶点着色器 ID
-    vertexShader = glCreateShader(GL_VERTEX_SHADER);            // 创建顶点着色器
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL); // 将着色器源码附加到着色器对象上
-    glCompileShader(vertexShader);                              // 编译着色器
-    int success;
-    char infoLog[512];
-    if (!success)
-    {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog); // 获取编译错误信息
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n"
-                  << infoLog << std::endl;
-    }
-
-    /**
-     * 片段着色器
-     * 创建着色器对象，附加源码到着色器对象，编译着色器，检查编译错误
-     */
-    unsigned int fragmentShader;                                    // 片段着色器 ID
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);            // 创建片段着色器
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL); // 将着色器源码附加到着色器对象上
-    glCompileShader(fragmentShader);                                // 编译着色器
-    if (!success)
-    {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog); // 获取编译错误信息
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n"
-                  << infoLog << std::endl;
-    }
-
-    /**
-     * 着色器程序
-     * 创建着色器程序，附加顶点着色器和片段着色器，链接着色器程序，检查链接错误
-     */
-    unsigned int shaderProgram;                    // 着色器程序 ID
-    shaderProgram = glCreateProgram();             // 创建着色器程序
-    glAttachShader(shaderProgram, vertexShader);   // 将顶点着色器附加到着色器程序上
-    glAttachShader(shaderProgram, fragmentShader); // 将片段着色器附加到着色器程序上
-    glLinkProgram(shaderProgram);                  // 链接着色器程序
-    glDeleteShader(vertexShader);                  // 删除着色器对象，链接后不再需要
-    glDeleteShader(fragmentShader);                // 删除着色器对象，链接后不再需要
-    if (!success)
-    {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog); // 获取链接错误信息
-        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n"
-                  << infoLog << std::endl;
-    }
+    Shader ourShader("./shaders/main.vs", "./shaders/main.fs");
 
     // 两个三角形组成一个矩形
     float vertices[] = {
@@ -183,7 +111,13 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(shaderProgram);      // 使用着色器程序
+        ourShader.use(); // 使用着色器程序
+
+        // 更新 uniform 颜色
+        float timeValue = glfwGetTime(); // 获取时间
+        int timeLocation = glGetUniformLocation(ourShader.ID, "time");
+        glUniform1f(timeLocation, timeValue);
+
         glBindVertexArray(VAO);           // 绑定顶点数组对象
         glDrawArrays(GL_TRIANGLES, 0, 3); // 绘制三角形
 

@@ -8,6 +8,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(GLFW_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../Dependence/glfw-3.4.bin.WIN64)
 set(GLFW_INCLUDE_DIR ${GLFW_DIR}/include)
 set(GLFW_LIBRARY_DIR ${GLFW_DIR}/lib-mingw-w64)
+set(SHADERS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/shaders)
+
+# COPY SHADERS
+file(COPY ${SHADERS_DIR} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 message(STATUS "----------------- GLFW -----------------")
 message(STATUS "GLFW_DIR: ${GLFW_DIR}")
