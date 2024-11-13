@@ -6,6 +6,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/string_cast.hpp>
 #include "shader.hpp"
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
@@ -60,7 +62,7 @@ int main()
 
     unsigned int indices[] = {
         0, 1, 3, // 第一个三角形
-        1, 2, 3  // 第二个三角形
+        1, 2, 3, // 第二个三角形
     };
 
     /**
@@ -142,13 +144,22 @@ int main()
 
         ourShader.use(); // 使用着色器程序
 
-        // 更新 uniform 颜色
-        float timeValue = glfwGetTime(); // 获取时间
-        int timeLocation = glGetUniformLocation(ourShader.ID, "time");
-        glUniform1f(timeLocation, timeValue);
-
         glBindTexture(GL_TEXTURE_2D, texture);
         glBindVertexArray(VAO);
+
+        glm::mat4 transform = glm::mat4(1.0f);
+        // 第一个矩形绘制
+        transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
+        transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+        ourShader.setMat4("transform", transform);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        // 第二个矩形绘制
+        transform = glm::mat4(1.0f);
+        transform = glm::translate(transform, glm::vec3(-0.5f, 0.5f, 0.0f));
+        float scaleAmount = sin(glfwGetTime());
+        transform = glm::scale(transform, glm::vec3(scaleAmount, scaleAmount, scaleAmount));
+        ourShader.setMat4("transform", transform);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         // 检查并调用事件，交换缓冲
