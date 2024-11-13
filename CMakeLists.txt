@@ -31,6 +31,7 @@ link_directories(
 add_executable(
     OpenGL_Learn 
     src/main.cpp
+    src/shader.cpp
     src/glad.c
 )
 
