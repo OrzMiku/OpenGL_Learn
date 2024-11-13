@@ -18,6 +18,7 @@
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window);
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
+void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 
 const unsigned int SCR_WIDTH = 600;
 const unsigned int SCR_HEIGHT = 600;
@@ -34,6 +35,8 @@ float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 float yaw = -90.0f;
 float pitch = 0;
+
+float fov = 45.0f;
 
 int main()
 {
@@ -60,6 +63,7 @@ int main()
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
 
     // GLAD Init
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -203,7 +207,7 @@ int main()
             model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
             model = glm::rotate(model, timeValue * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
             view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-            projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+            projection = glm::perspective(glm::radians(fov), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
             ourShader.setMat4("model", model);
             ourShader.setMat4("view", view);
             ourShader.setMat4("projection", projection);
@@ -258,6 +262,18 @@ void processInput(GLFWwindow *window)
         cameraPos += cameraSpeed * cameraUp;
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
         cameraPos -= cameraSpeed * cameraUp;
+    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+    {
+        fov = 45.0f;
+        cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+        cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+        cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+        firstMouse = true;
+        lastX = SCR_WIDTH / 2.0f;
+        lastY = SCR_HEIGHT / 2.0f;
+        yaw = -90.0f;
+        pitch = 0;
+    }
 }
 
 /**
@@ -297,4 +313,20 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos)
     front.y = sin(glm::radians(pitch));
     front.z = cos(glm::radians(pitch)) * sin(glm::radians(yaw));
     cameraFront = glm::normalize(front);
+}
+
+/**
+ * @brief Callback function for mouse scroll event
+ * @param window Pointer to the GLFW window
+ * @param xoffset Scroll offset in x direction
+ * @param yoffset Scroll offset in y direction
+ */
+void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
+{
+    if (fov >= 1.0f && fov <= 90.0f)
+        fov -= yoffset;
+    if (fov <= 1.0f)
+        fov = 1.0f;
+    if (fov >= 90.0f)
+        fov = 90.0f;
 }
