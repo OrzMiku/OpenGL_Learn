@@ -53,53 +53,77 @@ int main()
 
     // 顶点数据
     float vertices[] = {
-        //     ---- 位置 ----       ---- 颜色 ----     - 纹理坐标 -
-        0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,   // 右上
-        0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,  // 右下
-        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, // 左下
-        -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f   // 左上
-    };
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
+        0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
+        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
 
-    unsigned int indices[] = {
-        0, 1, 3, // 第一个三角形
-        1, 2, 3, // 第二个三角形
-    };
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
+        0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
+        -0.5f, 0.5f, 0.5f, 0.0f, 1.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+
+        -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+        -0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+        -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+        0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+        0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+
+        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f, 1.0f, 1.0f,
+        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
+        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f,
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f};
+
+    glm::vec3 cubePositions[] = {
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(2.0f, 5.0f, -15.0f),
+        glm::vec3(-1.5f, -2.2f, -2.5f),
+        glm::vec3(-3.8f, -2.0f, -12.3f),
+        glm::vec3(2.4f, -0.4f, -3.5f),
+        glm::vec3(-1.7f, 3.0f, -7.5f),
+        glm::vec3(1.3f, -2.0f, -2.5f),
+        glm::vec3(1.5f, 2.0f, -2.5f),
+        glm::vec3(1.5f, 0.2f, -1.5f),
+        glm::vec3(-1.3f, 1.0f, -1.5f)};
 
     /**
      * VBO 用来存储顶点数据
      * VAO 用来存储顶点属性配置
      * EBO 用来存储索引数据
      */
-    unsigned int VBO, VAO, EBO;                                                      // 顶点缓冲对象 ID 顶点数组对象 ID 索引缓冲对象 ID
-    glGenVertexArrays(1, &VAO);                                                      // 创建顶点数组对象
-    glGenBuffers(1, &VBO);                                                           // 创建缓冲对象
-    glGenBuffers(1, &EBO);                                                           // 创建索引缓冲对象
-    glBindVertexArray(VAO);                                                          // 绑定顶点数组对象
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);                                              // 绑定缓冲对象
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);                                      // 绑定索引缓冲对象
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);       // 将顶点数据复制到缓冲中
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW); // 将索引数据复制到缓冲中
+    unsigned int VBO, VAO;                                                     // 顶点缓冲对象 ID 顶点数组对象 ID
+    glGenVertexArrays(1, &VAO);                                                // 创建顶点数组对象
+    glGenBuffers(1, &VBO);                                                     // 创建缓冲对象
+    glBindVertexArray(VAO);                                                    // 绑定顶点数组对象
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);                                        // 绑定缓冲对象
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // 将顶点数据复制到缓冲中
 
-    /**
-     * 表示顶点索引位置为0，有 3 个值，每个值为 float 类型，不需要标准化，步长为 8 个 float，偏移量为 0
-     * glEnableVertexAttribArray的参数是顶点属性的位置值，这个值是在顶点着色器中使用 layout (location = 0) in vec3 aPos; 定义的
-     */
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0); // 设置顶点属性指针
-    glEnableVertexAttribArray(0);                                                  // 启用顶点属性
-
-    /**
-     * 表示顶点索引位置为1，有 3 个值，每个值为 float 类型，不需要标准化，步长为 8 个 float，偏移量为 3 个 float
-     * glEnableVertexAttribArray的参数是顶点属性的位置值，这个值是在顶点着色器中使用 layout (location = 1) in vec3 aColor; 定义的
-     */
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float))); // 设置顶点属性指针
-    glEnableVertexAttribArray(1);                                                                    // 启用顶点属性
-
-    /**
-     * 表示顶点索引位置为2，有 2 个值，每个值为 float 类型，不需要标准化，步长为 8 个 float，偏移量为 6 个 float
-     * glEnableVertexAttribArray的参数是顶点属性的位置值，这个值是在顶点着色器中使用 layout (location = 2) in vec2 aTexCoord; 定义的
-     */
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
+    // Attr 设置
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     /**
      * 已经将数据存入缓冲对象，不需要对 VBO 进行操作，可以解绑缓冲对象
@@ -139,28 +163,32 @@ int main()
         processInput(window);
 
         // 渲染
+        glEnable(GL_DEPTH_TEST);
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         ourShader.use(); // 使用着色器程序
 
         glBindTexture(GL_TEXTURE_2D, texture);
         glBindVertexArray(VAO);
 
-        glm::mat4 transform = glm::mat4(1.0f);
-        // 第一个矩形绘制
-        transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
-        transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-        ourShader.setMat4("transform", transform);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-        // 第二个矩形绘制
-        transform = glm::mat4(1.0f);
-        transform = glm::translate(transform, glm::vec3(-0.5f, 0.5f, 0.0f));
-        float scaleAmount = sin(glfwGetTime());
-        transform = glm::scale(transform, glm::vec3(scaleAmount, scaleAmount, scaleAmount));
-        ourShader.setMat4("transform", transform);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        for (unsigned int i = 0; i < 10; i++)
+        {
+            glm::mat4 trans = glm::mat4(1.0);
+            glm::mat4 model = glm::mat4(1.0);
+            glm::mat4 view = glm::mat4(1.0);
+            glm::mat4 projection = glm::mat4(1.0);
+            float angle = 20.0f * i;
+            model = glm::translate(model, cubePositions[i]);
+            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+            view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+            projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+            ourShader.setMat4("model", model);
+            ourShader.setMat4("view", view);
+            ourShader.setMat4("projection", projection);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
 
         // 检查并调用事件，交换缓冲
         glfwSwapBuffers(window);
