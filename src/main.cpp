@@ -17,6 +17,7 @@
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window);
+void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 
 const unsigned int SCR_WIDTH = 600;
 const unsigned int SCR_HEIGHT = 600;
@@ -27,6 +28,12 @@ float lastFrame = 0.0f;
 glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+bool firstMouse = true;
+float lastX = SCR_WIDTH / 2.0f;
+float lastY = SCR_HEIGHT / 2.0f;
+float yaw = -90.0f;
+float pitch = 0;
 
 int main()
 {
@@ -51,6 +58,8 @@ int main()
     // Make Context Current
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetCursorPosCallback(window, mouse_callback);
 
     // GLAD Init
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -234,8 +243,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height)
  */
 void processInput(GLFWwindow *window)
 {
-    float cameraSpeed = 2.0 * deltaTime;
-    float rotateSpeed = 50.0 * deltaTime;
+    float cameraSpeed = 5.0 * deltaTime;
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
@@ -246,24 +254,47 @@ void processInput(GLFWwindow *window)
         cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        cameraPos += cameraSpeed * cameraUp;
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+        cameraPos -= cameraSpeed * cameraUp;
+}
+
+/**
+ * @brief Callback function for mouse movement event
+ * @param window Pointer to the GLFW window
+ * @param xpos X position of the mouse cursor
+ * @param ypos Y position of the mouse cursor
+ */
+void mouse_callback(GLFWwindow *window, double xpos, double ypos)
+{
+    if (firstMouse)
     {
-        glm::mat4 rotate = glm::rotate(glm::mat4(1.0), glm::radians(rotateSpeed), glm::vec3(0.0f, 1.0f, 0.0f));
-        cameraFront = glm::vec3(rotate * glm::vec4(cameraFront, 1.0));
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
     }
-    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-    {
-        glm::mat4 rotate = glm::rotate(glm::mat4(1.0), glm::radians(-rotateSpeed), glm::vec3(0.0f, 1.0f, 0.0f));
-        cameraFront = glm::vec3(rotate * glm::vec4(cameraFront, 1.0));
-    }
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-    {
-        glm::mat4 rotate = glm::rotate(glm::mat4(1.0), glm::radians(rotateSpeed), glm::normalize(glm::cross(cameraFront, cameraUp)));
-        cameraFront = glm::vec3(rotate * glm::vec4(cameraFront, 1.0));
-    }
-    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-    {
-        glm::mat4 rotate = glm::rotate(glm::mat4(1.0), glm::radians(-rotateSpeed), glm::normalize(glm::cross(cameraFront, cameraUp)));
-        cameraFront = glm::vec3(rotate * glm::vec4(cameraFront, 1.0));
-    }
+
+    float xoffset = (xpos - lastX);
+    float yoffset = (lastY - ypos);
+    lastX = xpos;
+    lastY = ypos;
+
+    float sensitivity = 0.05;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    yaw += xoffset;
+    pitch += yoffset;
+
+    if (pitch > 89.0f)
+        pitch = 89.0f;
+    if (pitch < -89.0f)
+        pitch = -89.0f;
+
+    glm::vec3 front;
+    front.x = cos(glm::radians(pitch)) * cos(glm::radians(yaw));
+    front.y = sin(glm::radians(pitch));
+    front.z = cos(glm::radians(pitch)) * sin(glm::radians(yaw));
+    cameraFront = glm::normalize(front);
 }
